@@ -136,16 +136,19 @@ public class TelaClientes extends BaseFrame {
 
     private void mostrarRegistro() {
 
-        Cliente c = lista.get(indice);
+    Cliente c = lista.get(indice);
 
-        txtId.setText(String.valueOf(c.getIdCliente()));
-        txtNome.setText(c.getNome());
-        txtCpf.setText(c.getCpf());
-        txtTelefone.setText(c.getTelefone());
-        txtEmail.setText(c.getEmail());
-        txtEndereco.setText(c.getEndereco());
-        dateCadastro.setDate(c.getDataCadastro());
-    }
+    txtId.setText(String.valueOf(c.getIdCliente()));
+    txtNome.setText(c.getNome());
+    txtCpf.setText(c.getCpf());
+    txtTelefone.setText(c.getTelefone());
+    txtEmail.setText(c.getEmail());
+    txtEndereco.setText(c.getEndereco());
+    dateCadastro.setDate(c.getDataCadastro());
+
+    // 🔥 Carregar pets automaticamente
+    carregarPetsDoCliente(c.getIdCliente());
+}
 
     private void navegar(int novoIndice) {
         if (lista != null && novoIndice >= 0 && novoIndice < lista.size()) {
@@ -229,3 +232,4 @@ private void carregarPetsDoCliente(int idCliente) {
     }
 }
 }
+
