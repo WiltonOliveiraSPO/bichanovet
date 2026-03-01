@@ -43,4 +43,10 @@ public class Cliente {
 
     public Date getDataCadastro() { return dataCadastro; }
     public void setDataCadastro(Date dataCadastro) { this.dataCadastro = dataCadastro; }
+
+    @Override
+    public String toString() {
+    return id_cliente + " - " + nome;
+    }
+
 }
