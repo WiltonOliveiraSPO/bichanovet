@@ -84,4 +84,41 @@ public class PetDAO {
             e.printStackTrace();
         }
     }
+
+    public List<Pet> listarPorCliente(int idCliente) {
+
+    List<Pet> lista = new ArrayList<>();
+
+    String sql = """
+        SELECT * FROM pets
+        WHERE id_cliente = ?
+    """;
+
+    try (Connection conn = ConexaoSQLite.conectar();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setInt(1, idCliente);
+
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+
+            Pet p = new Pet();
+            p.setIdPet(rs.getInt("id_pet"));
+            p.setNomePet(rs.getString("nome_pet"));
+            p.setEspecie(rs.getString("especie"));
+            p.setRaca(rs.getString("raca"));
+            p.setSexo(rs.getString("sexo"));
+            p.setDataNascimento(rs.getDate("data_nascimento"));
+            p.setObservacoes(rs.getString("observacoes"));
+
+            lista.add(p);
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return lista;
+}
 }
