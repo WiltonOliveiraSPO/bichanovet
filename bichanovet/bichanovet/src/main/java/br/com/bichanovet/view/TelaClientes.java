@@ -20,15 +20,20 @@ public class TelaClientes extends BaseFrame {
     private List<Cliente> lista;
     private int indice = -1;
 
+    private JTable tabelaPets;
+    private DefaultTableModel modeloPets;
+    private PetDAO petDAO = new PetDAO();
+
     public TelaClientes() {
         configurarJanela();
         inicializarComponentes();
+        add(painel, BorderLayout.CENTER);
         carregarLista();
     }
 
     private void configurarJanela() {
         setTitle("Cadastro de Clientes");
-        setSize(600, 500);
+        setSize(700, 650);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
     }
@@ -108,6 +113,18 @@ public class TelaClientes extends BaseFrame {
         btnProximo.addActionListener(e -> navegar(indice + 1));
         btnUltimo.addActionListener(e -> navegar(lista.size() - 1));
     }
+
+    // ================= TABELA DE PETS =================
+    modeloPets = new DefaultTableModel(
+        new Object[]{"ID", "Nome", "Espécie", "Raça", "Sexo", "Nascimento"}, 0
+    );
+
+    tabelaPets = new JTable(modeloPets);
+
+    JScrollPane scrollPets = new JScrollPane(tabelaPets);
+    scrollPets.setBorder(BorderFactory.createTitledBorder("🐾 Pets do Cliente"));
+
+    add(scrollPets, BorderLayout.SOUTH);
 
     private void carregarLista() {
         lista = dao.listar();
@@ -193,4 +210,22 @@ public class TelaClientes extends BaseFrame {
         txtEndereco.setText("");
         dateCadastro.setDate(null);
     }
+private void carregarPetsDoCliente(int idCliente) {
+
+    modeloPets.setRowCount(0);
+
+    List<Pet> pets = petDAO.listarPorCliente(idCliente);
+
+    for (Pet p : pets) {
+
+        modeloPets.addRow(new Object[]{
+                p.getIdPet(),
+                p.getNomePet(),
+                p.getEspecie(),
+                p.getRaca(),
+                p.getSexo(),
+                p.getDataNascimento()
+        });
+    }
+}
 }
