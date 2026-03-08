@@ -4,8 +4,8 @@ import java.util.Date;
 
 public class Pet {
 
-    private int idPet;
-    private Cliente cliente;
+    private Integer idPet;
+    private Integer idCliente;
     private String nomePet;
     private String especie;
     private String raca;
@@ -13,11 +13,11 @@ public class Pet {
     private Date dataNascimento;
     private String observacoes;
 
-    public int getIdPet() { return idPet; }
-    public void setIdPet(int idPet) { this.idPet = idPet; }
+    public Integer getIdPet() { return idPet; }
+    public void setIdPet(Integer idPet) { this.idPet = idPet; }
 
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public Integer getIdCliente() { return idCliente; }
+    public void setIdCliente(Integer idCliente) { this.idCliente = idCliente; }
 
     public String getNomePet() { return nomePet; }
     public void setNomePet(String nomePet) { this.nomePet = nomePet; }

@@ -1,12 +1,28 @@
 package br.com.bichanovet.view;
 
 import br.com.bichanovet.dao.ClienteDAO;
+import br.com.bichanovet.dao.PetDAO;
 import br.com.bichanovet.model.Cliente;
+import br.com.bichanovet.model.Pet;
+import br.com.bichanovet.util.BotaoCarameloUtil;
 import com.toedter.calendar.JDateChooser;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.text.MaskFormatter;
-import java.awt.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -16,42 +32,42 @@ public class TelaClientes extends BaseFrame {
     private JFormattedTextField txtCpf;
     private JDateChooser dateCadastro;
 
-    private ClienteDAO dao = new ClienteDAO();
-    private List<Cliente> lista;
-    private int indice = -1;
-
     private JTable tabelaPets;
     private DefaultTableModel modeloPets;
-    private PetDAO petDAO = new PetDAO();
+
+    private final ClienteDAO dao = new ClienteDAO();
+    private final PetDAO petDAO = new PetDAO();
+    private List<Cliente> lista;
+    private int indice = -1;
 
     public TelaClientes() {
         configurarJanela();
         inicializarComponentes();
-        add(painel, BorderLayout.CENTER);
         carregarLista();
     }
 
     private void configurarJanela() {
         setTitle("Cadastro de Clientes");
-        setSize(700, 650);
+        setSize(800, 650);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+        getContentPane().setBackground(BotaoCarameloUtil.COR_FUNDO_TELA);
     }
 
     private void inicializarComponentes() {
 
-        // ================= BOTÕES SUPERIORES =================
         JPanel painelBotoes = new JPanel(new FlowLayout());
+        painelBotoes.setBackground(BotaoCarameloUtil.COR_FUNDO_PAINEL);
 
-        JButton btnNovo = new JButton("Novo");
-        JButton btnSalvar = new JButton("Salvar");
-        JButton btnAtualizar = new JButton("Atualizar");
-        JButton btnExcluir = new JButton("Excluir");
+        JButton btnNovo = BotaoCarameloUtil.criarBotao("🆕 Novo");
+        JButton btnSalvar = BotaoCarameloUtil.criarBotao("💾 Salvar");
+        JButton btnAtualizar = BotaoCarameloUtil.criarBotao("✏️ Atualizar");
+        JButton btnExcluir = BotaoCarameloUtil.criarBotao("🗑 Excluir");
 
-        JButton btnPrimeiro = new JButton("|<");
-        JButton btnAnterior = new JButton("<");
-        JButton btnProximo = new JButton(">");
-        JButton btnUltimo = new JButton(">|");
+        JButton btnPrimeiro = BotaoCarameloUtil.criarBotao("⏮");
+        JButton btnAnterior = BotaoCarameloUtil.criarBotao("◀️");
+        JButton btnProximo = BotaoCarameloUtil.criarBotao("▶️");
+        JButton btnUltimo = BotaoCarameloUtil.criarBotao("⏭");
 
         painelBotoes.add(btnNovo);
         painelBotoes.add(btnSalvar);
@@ -64,9 +80,9 @@ public class TelaClientes extends BaseFrame {
 
         add(painelBotoes, BorderLayout.NORTH);
 
-        // ================= DADOS =================
-        JPanel painel = new JPanel(new GridLayout(7,2,10,10));
-        painel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+        JPanel painel = new JPanel(new GridLayout(7, 2, 10, 10));
+        painel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        painel.setBackground(BotaoCarameloUtil.COR_FUNDO_TELA);
 
         txtId = new JTextField();
         txtId.setEditable(false);
@@ -95,14 +111,49 @@ public class TelaClientes extends BaseFrame {
         painel.add(txtTelefone);
         painel.add(new JLabel("Email:"));
         painel.add(txtEmail);
-        painel.add(new JLabel("Endereço:"));
+        painel.add(new JLabel("Endereco:"));
         painel.add(txtEndereco);
         painel.add(new JLabel("Data Cadastro:"));
         painel.add(dateCadastro);
 
         add(painel, BorderLayout.CENTER);
 
-        // ================= AÇÕES =================
+        modeloPets = new DefaultTableModel(new Object[]{"ID Pet", "Nome", "Especie", "Raca", "Sexo", "Nascimento"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tabelaPets = new JTable(modeloPets);
+        tabelaPets.setBackground(new Color(255, 248, 237));
+        tabelaPets.setSelectionBackground(new Color(224, 181, 129));
+
+        tabelaPets.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int row = tabelaPets.getSelectedRow();
+                    if (row >= 0) {
+                        Object idValor = tabelaPets.getValueAt(row, 0);
+                        if (idValor != null) {
+                            int idPet = Integer.parseInt(idValor.toString());
+                            TelaPets telaPets = new TelaPets();
+                            telaPets.selecionarPetPorId(idPet);
+                            telaPets.setVisible(true);
+                        }
+                    }
+                }
+            }
+        });
+
+        JScrollPane scrollPets = new JScrollPane(tabelaPets);
+        scrollPets.setBorder(BorderFactory.createTitledBorder("Pets do Cliente"));
+        scrollPets.getViewport().setBackground(BotaoCarameloUtil.COR_FUNDO_TELA);
+        scrollPets.setPreferredSize(new java.awt.Dimension(700, 210));
+
+        add(scrollPets, BorderLayout.SOUTH);
+
         btnNovo.addActionListener(e -> limparCampos());
         btnSalvar.addActionListener(e -> salvar());
         btnAtualizar.addActionListener(e -> atualizar());
@@ -111,44 +162,61 @@ public class TelaClientes extends BaseFrame {
         btnPrimeiro.addActionListener(e -> navegar(0));
         btnAnterior.addActionListener(e -> navegar(indice - 1));
         btnProximo.addActionListener(e -> navegar(indice + 1));
-        btnUltimo.addActionListener(e -> navegar(lista.size() - 1));
+        btnUltimo.addActionListener(e -> {
+            if (lista != null && !lista.isEmpty()) {
+                navegar(lista.size() - 1);
+            }
+        });
     }
-
-    // ================= TABELA DE PETS =================
-    modeloPets = new DefaultTableModel(
-        new Object[]{"ID", "Nome", "Espécie", "Raça", "Sexo", "Nascimento"}, 0
-    );
-
-    tabelaPets = new JTable(modeloPets);
-
-    JScrollPane scrollPets = new JScrollPane(tabelaPets);
-    scrollPets.setBorder(BorderFactory.createTitledBorder("🐾 Pets do Cliente"));
-
-    add(scrollPets, BorderLayout.SOUTH);
 
     private void carregarLista() {
         lista = dao.listar();
-        if (!lista.isEmpty()) {
+        if (lista != null && !lista.isEmpty()) {
             indice = 0;
             mostrarRegistro();
+        } else {
+            indice = -1;
+            limparCampos();
         }
     }
 
     private void mostrarRegistro() {
 
-    Cliente c = lista.get(indice);
+        Cliente c = lista.get(indice);
 
-    txtId.setText(String.valueOf(c.getIdCliente()));
-    txtNome.setText(c.getNome());
-    txtCpf.setText(c.getCpf());
-    txtTelefone.setText(c.getTelefone());
-    txtEmail.setText(c.getEmail());
-    txtEndereco.setText(c.getEndereco());
-    dateCadastro.setDate(c.getDataCadastro());
+        txtId.setText(String.valueOf(c.getIdCliente()));
+        txtNome.setText(c.getNome());
+        txtCpf.setText(c.getCpf());
+        txtTelefone.setText(c.getTelefone());
+        txtEmail.setText(c.getEmail());
+        txtEndereco.setText(c.getEndereco());
+        dateCadastro.setDate(c.getDataCadastro());
 
-    // 🔥 Carregar pets automaticamente
-    carregarPetsDoCliente(c.getIdCliente());
-}
+        carregarGridPets(c.getIdCliente());
+    }
+
+    private void carregarGridPets(Integer idCliente) {
+        modeloPets.setRowCount(0);
+
+        if (idCliente == null) {
+            return;
+        }
+
+        List<Pet> pets = petDAO.listarPorCliente(idCliente);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
+        for (Pet pet : pets) {
+            String dataNascimento = pet.getDataNascimento() == null ? "" : sdf.format(pet.getDataNascimento());
+            modeloPets.addRow(new Object[]{
+                    pet.getIdPet(),
+                    pet.getNomePet(),
+                    pet.getEspecie(),
+                    pet.getRaca(),
+                    pet.getSexo(),
+                    dataNascimento
+            });
+        }
+    }
 
     private void navegar(int novoIndice) {
         if (lista != null && novoIndice >= 0 && novoIndice < lista.size()) {
@@ -171,12 +239,12 @@ public class TelaClientes extends BaseFrame {
 
         carregarLista();
 
-        // Ir automaticamente para o último registro inserido
         if (lista != null && !lista.isEmpty()) {
             indice = lista.size() - 1;
             mostrarRegistro();
         }
     }
+
     private void atualizar() {
 
         if (!txtId.getText().isEmpty()) {
@@ -200,7 +268,6 @@ public class TelaClientes extends BaseFrame {
         if (!txtId.getText().isEmpty()) {
             dao.excluir(Integer.parseInt(txtId.getText()));
             carregarLista();
-            limparCampos();
         }
     }
 
@@ -212,24 +279,6 @@ public class TelaClientes extends BaseFrame {
         txtEmail.setText("");
         txtEndereco.setText("");
         dateCadastro.setDate(null);
-    }
-private void carregarPetsDoCliente(int idCliente) {
-
-    modeloPets.setRowCount(0);
-
-    List<Pet> pets = petDAO.listarPorCliente(idCliente);
-
-    for (Pet p : pets) {
-
-        modeloPets.addRow(new Object[]{
-                p.getIdPet(),
-                p.getNomePet(),
-                p.getEspecie(),
-                p.getRaca(),
-                p.getSexo(),
-                p.getDataNascimento()
-        });
+        modeloPets.setRowCount(0);
     }
 }
-}
-
