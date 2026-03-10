@@ -28,6 +28,10 @@ public class TelaInicial extends JFrame {
             TelaProdutos tela = new TelaProdutos();
             tela.setVisible(true);
         });
+        btnVendas.addActionListener(e -> {
+            TelaVendas tela = new TelaVendas();
+            tela.setVisible(true);
+        });
         configurarIconeSistema();
 
         IconeUtil.aplicarIconeCliente(btnClientes);

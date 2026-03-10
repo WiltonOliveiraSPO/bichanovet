@@ -65,6 +65,34 @@ public class ClienteDAO {
         }
     }
 
+    public Cliente buscarPorId(int idCliente) {
+        String sql = "SELECT * FROM clientes WHERE id_cliente=?";
+
+        try (Connection conn = ConexaoSQLite.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idCliente);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Cliente c = new Cliente();
+                    c.setIdCliente(rs.getInt("id_cliente"));
+                    c.setNome(rs.getString("nome"));
+                    c.setCpf(rs.getString("cpf"));
+                    c.setTelefone(rs.getString("telefone"));
+                    c.setEmail(rs.getString("email"));
+                    c.setEndereco(rs.getString("endereco"));
+                    c.setDataCadastro(rs.getTimestamp("data_cadastro"));
+                    return c;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public List<Cliente> listar() {
 
         List<Cliente> lista = new ArrayList<>();

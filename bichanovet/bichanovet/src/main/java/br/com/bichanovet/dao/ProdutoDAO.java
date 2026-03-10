@@ -72,6 +72,48 @@ public class ProdutoDAO {
         }
     }
 
+    public void atualizarEstoque(int idProduto, int delta) {
+        String sql = "UPDATE produtos SET estoque = estoque + ? WHERE id_produto=?";
+
+        try (Connection conn = ConexaoSQLite.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, delta);
+            stmt.setInt(2, idProduto);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Produto buscarPorId(int idProduto) {
+        String sql = "SELECT * FROM produtos WHERE id_produto=?";
+
+        try (Connection conn = ConexaoSQLite.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idProduto);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Produto produto = new Produto();
+                    produto.setIdProduto(rs.getInt("id_produto"));
+                    produto.setNomeProduto(rs.getString("nome_produto"));
+                    produto.setIdCategoria(rs.getInt("id_categoria"));
+                    produto.setTipo(rs.getString("tipo"));
+                    produto.setPreco(rs.getDouble("preco"));
+                    produto.setEstoque(rs.getInt("estoque"));
+                    produto.setAtivo(rs.getInt("ativo"));
+                    return produto;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public void excluir(int idProduto) {
         String sql = "DELETE FROM produtos WHERE id_produto=?";
 
@@ -88,6 +130,32 @@ public class ProdutoDAO {
     public List<Produto> listar() {
         List<Produto> lista = new ArrayList<>();
         String sql = "SELECT * FROM produtos ORDER BY id_produto";
+
+        try (Connection conn = ConexaoSQLite.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Produto produto = new Produto();
+                produto.setIdProduto(rs.getInt("id_produto"));
+                produto.setNomeProduto(rs.getString("nome_produto"));
+                produto.setIdCategoria(rs.getInt("id_categoria"));
+                produto.setTipo(rs.getString("tipo"));
+                produto.setPreco(rs.getDouble("preco"));
+                produto.setEstoque(rs.getInt("estoque"));
+                produto.setAtivo(rs.getInt("ativo"));
+                lista.add(produto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return lista;
+    }
+
+    public List<Produto> listarAtivos() {
+        List<Produto> lista = new ArrayList<>();
+        String sql = "SELECT * FROM produtos WHERE ativo=1 ORDER BY nome_produto";
 
         try (Connection conn = ConexaoSQLite.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
