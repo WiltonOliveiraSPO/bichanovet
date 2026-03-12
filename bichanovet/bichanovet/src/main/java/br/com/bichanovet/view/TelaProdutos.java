@@ -7,13 +7,18 @@ import br.com.bichanovet.model.Produto;
 import br.com.bichanovet.util.BotaoCarameloUtil;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -50,31 +55,42 @@ public class TelaProdutos extends BaseFrame {
     }
 
     private void inicializarComponentes() {
-        JPanel painelBotoes = new JPanel(new FlowLayout());
+        JPanel painelBotoes = new JPanel();
+        painelBotoes.setLayout(new BoxLayout(painelBotoes, BoxLayout.Y_AXIS));
         painelBotoes.setBackground(BotaoCarameloUtil.COR_FUNDO_PAINEL);
+
+        JPanel painelCrud = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        painelCrud.setBackground(BotaoCarameloUtil.COR_FUNDO_PAINEL);
 
         JButton btnNovo = BotaoCarameloUtil.criarBotao("🆕 Novo");
         JButton btnSalvar = BotaoCarameloUtil.criarBotao("💾 Salvar");
         JButton btnAtualizar = BotaoCarameloUtil.criarBotao("✏️ Atualizar");
         JButton btnExcluir = BotaoCarameloUtil.criarBotao("🗑 Excluir");
 
+        painelCrud.add(btnNovo);
+        painelCrud.add(btnSalvar);
+        painelCrud.add(btnAtualizar);
+        painelCrud.add(btnExcluir);
+
+        JPanel painelNav = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        painelNav.setBackground(BotaoCarameloUtil.COR_FUNDO_PAINEL);
+
         JButton btnPrimeiro = BotaoCarameloUtil.criarBotao("⏮");
         JButton btnAnterior = BotaoCarameloUtil.criarBotao("◀️");
         JButton btnProximo = BotaoCarameloUtil.criarBotao("▶️");
         JButton btnUltimo = BotaoCarameloUtil.criarBotao("⏭");
 
-        painelBotoes.add(btnNovo);
-        painelBotoes.add(btnSalvar);
-        painelBotoes.add(btnAtualizar);
-        painelBotoes.add(btnExcluir);
-        painelBotoes.add(btnPrimeiro);
-        painelBotoes.add(btnAnterior);
-        painelBotoes.add(btnProximo);
-        painelBotoes.add(btnUltimo);
+        painelNav.add(btnPrimeiro);
+        painelNav.add(btnAnterior);
+        painelNav.add(btnProximo);
+        painelNav.add(btnUltimo);
+
+        painelBotoes.add(painelCrud);
+        painelBotoes.add(painelNav);
 
         add(painelBotoes, BorderLayout.NORTH);
 
-        JPanel painel = new JPanel(new GridLayout(7, 2, 10, 10));
+        JPanel painel = new JPanel(new GridLayout(7, 2, 6, 8));
         painel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         painel.setBackground(BotaoCarameloUtil.COR_FUNDO_TELA);
 
@@ -87,24 +103,31 @@ public class TelaProdutos extends BaseFrame {
         txtPreco = new JTextField();
         txtEstoque = new JTextField("0");
         chkAtivo = new JCheckBox("Ativo", true);
-        chkAtivo.setBackground(BotaoCarameloUtil.COR_FUNDO_TELA);
 
-        painel.add(new JLabel("ID:"));
+        aplicarPaddingCampo(txtId);
+        aplicarPaddingCampo(txtNomeProduto);
+        aplicarPaddingCampo(txtPreco);
+        aplicarPaddingCampo(txtEstoque);        chkAtivo.setBackground(BotaoCarameloUtil.COR_FUNDO_TELA);
+
+        painel.add(criarLabel("ID:"));
         painel.add(txtId);
-        painel.add(new JLabel("Nome Produto:"));
+        painel.add(criarLabel("Nome Produto:"));
         painel.add(txtNomeProduto);
-        painel.add(new JLabel("Categoria:"));
+        painel.add(criarLabel("Categoria:"));
         painel.add(cbCategoria);
-        painel.add(new JLabel("Tipo:"));
+        painel.add(criarLabel("Tipo:"));
         painel.add(cbTipo);
-        painel.add(new JLabel("Preco:"));
+        painel.add(criarLabel("Preco:"));
         painel.add(txtPreco);
-        painel.add(new JLabel("Estoque:"));
+        painel.add(criarLabel("Estoque:"));
         painel.add(txtEstoque);
-        painel.add(new JLabel("Status:"));
+        painel.add(criarLabel("Status:"));
         painel.add(chkAtivo);
 
-        add(painel, BorderLayout.CENTER);
+        JPanel painelFormWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        painelFormWrapper.setBackground(BotaoCarameloUtil.COR_FUNDO_TELA);
+        painelFormWrapper.add(painel);
+        add(painelFormWrapper, BorderLayout.CENTER);
 
         btnNovo.addActionListener(e -> limparCampos());
         btnSalvar.addActionListener(e -> salvar());
@@ -244,6 +267,19 @@ public class TelaProdutos extends BaseFrame {
             JOptionPane.showMessageDialog(this, "Informe preco e estoque validos.");
             return null;
         }
+    }
+
+    private JLabel criarLabel(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setHorizontalAlignment(SwingConstants.RIGHT);
+        return label;
+    }
+
+    private void aplicarPaddingCampo(JComponent campo) {
+        if (campo == null) {
+            return;
+        }
+        campo.setBorder(new CompoundBorder(campo.getBorder(), new EmptyBorder(2, 6, 2, 6)));
     }
 
     private void limparCampos() {

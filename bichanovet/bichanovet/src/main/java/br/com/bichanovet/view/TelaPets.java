@@ -8,15 +8,21 @@ import br.com.bichanovet.util.BotaoCarameloUtil;
 import com.toedter.calendar.JDateChooser;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Component;
 import java.util.List;
 
 public class TelaPets extends BaseFrame {
@@ -68,31 +74,42 @@ public class TelaPets extends BaseFrame {
 
     private void inicializarComponentes() {
 
-        JPanel painelBotoes = new JPanel(new FlowLayout());
+        JPanel painelBotoes = new JPanel();
+        painelBotoes.setLayout(new BoxLayout(painelBotoes, BoxLayout.Y_AXIS));
         painelBotoes.setBackground(BotaoCarameloUtil.COR_FUNDO_PAINEL);
+
+        JPanel painelCrud = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        painelCrud.setBackground(BotaoCarameloUtil.COR_FUNDO_PAINEL);
 
         JButton btnNovo = BotaoCarameloUtil.criarBotao("🆕 Novo");
         JButton btnSalvar = BotaoCarameloUtil.criarBotao("💾 Salvar");
         JButton btnAtualizar = BotaoCarameloUtil.criarBotao("✏️ Atualizar");
         JButton btnExcluir = BotaoCarameloUtil.criarBotao("🗑 Excluir");
 
+        painelCrud.add(btnNovo);
+        painelCrud.add(btnSalvar);
+        painelCrud.add(btnAtualizar);
+        painelCrud.add(btnExcluir);
+
+        JPanel painelNav = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        painelNav.setBackground(BotaoCarameloUtil.COR_FUNDO_PAINEL);
+
         JButton btnPrimeiro = BotaoCarameloUtil.criarBotao("⏮");
         JButton btnAnterior = BotaoCarameloUtil.criarBotao("◀️");
         JButton btnProximo = BotaoCarameloUtil.criarBotao("▶️");
         JButton btnUltimo = BotaoCarameloUtil.criarBotao("⏭");
 
-        painelBotoes.add(btnNovo);
-        painelBotoes.add(btnSalvar);
-        painelBotoes.add(btnAtualizar);
-        painelBotoes.add(btnExcluir);
-        painelBotoes.add(btnPrimeiro);
-        painelBotoes.add(btnAnterior);
-        painelBotoes.add(btnProximo);
-        painelBotoes.add(btnUltimo);
+        painelNav.add(btnPrimeiro);
+        painelNav.add(btnAnterior);
+        painelNav.add(btnProximo);
+        painelNav.add(btnUltimo);
+
+        painelBotoes.add(painelCrud);
+        painelBotoes.add(painelNav);
 
         add(painelBotoes, BorderLayout.NORTH);
 
-        JPanel painel = new JPanel(new GridLayout(8, 2, 10, 10));
+        JPanel painel = new JPanel(new GridLayout(8, 2, 6, 8));
         painel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         painel.setBackground(BotaoCarameloUtil.COR_FUNDO_TELA);
 
@@ -107,24 +124,34 @@ public class TelaPets extends BaseFrame {
         dateNascimento = new JDateChooser();
         txtObservacoes = new JTextField();
 
-        painel.add(new JLabel("ID:"));
+        aplicarPaddingCampo(txtId);
+        aplicarPaddingCampo(txtNomePet);
+        aplicarPaddingCampo(txtEspecie);
+        aplicarPaddingCampo(txtRaca);
+        aplicarPaddingCampo(txtObservacoes);
+        aplicarPaddingData(dateNascimento);
+
+        painel.add(criarLabel("ID:"));
         painel.add(txtId);
-        painel.add(new JLabel("Cliente:"));
+        painel.add(criarLabel("Cliente:"));
         painel.add(cbCliente);
-        painel.add(new JLabel("Nome do Pet:"));
+        painel.add(criarLabel("Nome do Pet:"));
         painel.add(txtNomePet);
-        painel.add(new JLabel("Especie:"));
+        painel.add(criarLabel("Especie:"));
         painel.add(txtEspecie);
-        painel.add(new JLabel("Raca:"));
+        painel.add(criarLabel("Raca:"));
         painel.add(txtRaca);
-        painel.add(new JLabel("Sexo (M/F):"));
+        painel.add(criarLabel("Sexo (M/F):"));
         painel.add(cbSexo);
-        painel.add(new JLabel("Data Nascimento:"));
+        painel.add(criarLabel("Data Nascimento:"));
         painel.add(dateNascimento);
-        painel.add(new JLabel("Observacoes:"));
+        painel.add(criarLabel("Observacoes:"));
         painel.add(txtObservacoes);
 
-        add(painel, BorderLayout.CENTER);
+        JPanel painelFormWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        painelFormWrapper.setBackground(BotaoCarameloUtil.COR_FUNDO_TELA);
+        painelFormWrapper.add(painel);
+        add(painelFormWrapper, BorderLayout.CENTER);
 
         btnNovo.addActionListener(e -> limparCampos());
         btnSalvar.addActionListener(e -> salvar());
@@ -276,6 +303,12 @@ public class TelaPets extends BaseFrame {
         return true;
     }
 
+    private JLabel criarLabel(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setHorizontalAlignment(SwingConstants.RIGHT);
+        return label;
+    }
+
     private void limparCampos() {
         txtId.setText("");
         txtNomePet.setText("");
@@ -287,6 +320,23 @@ public class TelaPets extends BaseFrame {
 
         if (cbCliente.getItemCount() > 0) {
             cbCliente.setSelectedIndex(0);
+        }
+    }
+
+    private void aplicarPaddingCampo(JComponent campo) {
+        if (campo == null) {
+            return;
+        }
+        campo.setBorder(new CompoundBorder(campo.getBorder(), new EmptyBorder(2, 6, 2, 6)));
+    }
+
+    private void aplicarPaddingData(JDateChooser chooser) {
+        if (chooser == null) {
+            return;
+        }
+        Component editor = chooser.getDateEditor().getUiComponent();
+        if (editor instanceof JComponent) {
+            aplicarPaddingCampo((JComponent) editor);
         }
     }
 
